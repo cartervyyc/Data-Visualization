@@ -1,11 +1,11 @@
 import concurrent.futures
-from matplotlib import pyplot as plt
 import matplotlib
+# Important to disable the GUI before importing pyplot
+matplotlib.use('Agg') # Disables the GUI from matplotlib, which creates a limitation to using multiple threads and using matplotlib
+from matplotlib import pyplot as plt
 import csv
 import time
 from collections import defaultdict, Counter
-
-matplotlib.use('Agg') # Disables the GUI from matplotlib, which creates a limitation to using multiple threads and using matplotlib
 
 prices = []
 dates = []
@@ -85,8 +85,14 @@ if __name__ == "__main__":
     print(unique_cities)
     process_graphs = input("Enter any key to continue: ")
 
+    t1 = time.perf_counter()
+
     with concurrent.futures.ThreadPoolExecutor() as executor:
         print("Processing Graphs...")
         executor.map(visualize_data, unique_cities)
+
+    t2 = time.perf_counter()
+
+    print(f"Finished in {t2-t1} seconds")
 
 
