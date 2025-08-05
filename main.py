@@ -118,8 +118,14 @@ if __name__ == "__main__":
         for city in unique_cities
     ]
 
+    t1 = time.perf_counter()
+
     with concurrent.futures.ProcessPoolExecutor() as executor:
         print("Processing Graphs...")
         executor.map(visualize_data_fix, city_data_list)
+
+    t2 = time.perf_counter()
+
+    print(f"Completed in {t2-t1} seconds")
 
 
