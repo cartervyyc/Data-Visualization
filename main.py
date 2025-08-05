@@ -83,7 +83,13 @@ if __name__ == "__main__":
     print(unique_cities)
     process_graphs = input("Enter any key to continue: ")
 
+    t1 = time.perf_counter()
+
     for city in unique_cities:
         visualize_data(city)
+
+    t2 = time.perf_counter()
+
+    print(f"Completed in {t2-t1} seconds")
 
 
