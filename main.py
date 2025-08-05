@@ -5,8 +5,6 @@ import csv
 import time
 from collections import defaultdict, Counter
 
-matplotlib.use('Agg') # Disables the GUI from matplotlib, which creates a limitation to using multiple threads and using matplotlib
-
 prices = []
 dates = []
 
@@ -85,8 +83,7 @@ if __name__ == "__main__":
     print(unique_cities)
     process_graphs = input("Enter any key to continue: ")
 
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        print("Processing Graphs...")
-        executor.map(visualize_data, unique_cities)
+    for city in unique_cities:
+        visualize_data(city)
 
 
