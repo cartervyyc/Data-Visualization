@@ -5,8 +5,6 @@ import csv
 import time
 from collections import defaultdict, Counter
 
-matplotlib.use('Agg') # Disables the GUI from matplotlib, which creates a limitation to using multiple threads and using matplotlib
-
 prices = []
 dates = []
 
@@ -79,14 +77,49 @@ def visualize_data(city):
     plt.savefig(f"{city}.png")
     plt.close(fig) # Important - close the figure for thread safety and memory issues
 
+# In multiprocessing, each process gets its own memory, and it doesn't share globals, so the old version of using
+# city_price_map and city_date_map didn't work beacause each process gets an empty version of those maps, since the
+# maps are empty inside the individual processes.
+
+# Fix: Pass the data directly into the processes
+def visualize_data_fix(city_data):
+    city, dates, prices = city_data
+
+    if not dates or not prices:
+        # Missing data
+        print(f"Skipping {city}, missing data")
+        return
+
+    if len(dates) != len(prices):
+        # Incorrect amounts of data
+        print(f"Skipping {city}, data mismatch")
+        return
+
+    print(f"Generating plot for {city}")
+
+    fig = plt.figure()
+    plt.scatter(dates, prices, s=10, alpha=0.5)
+    plt.title(city)
+    plt.xlabel("Year")
+    plt.ylabel("Price")
+    plt.tight_layout()
+    plt.savefig(f"{city}.png")
+    plt.close(fig)  # Important - close the figure for thread safety and memory issues
+
 if __name__ == "__main__":
     read_data()
 
     print(unique_cities)
     process_graphs = input("Enter any key to continue: ")
 
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+    # Creating a list of the data before passing it into the process
+    city_data_list = [
+        (city, city_date_map[city], city_price_map[city])
+        for city in unique_cities
+    ]
+
+    with concurrent.futures.ProcessPoolExecutor() as executor:
         print("Processing Graphs...")
-        executor.map(visualize_data, unique_cities)
+        executor.map(visualize_data_fix, city_data_list)
 
 
